@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Job - Job Tracker</title>
+</head>
+<body>
+
+    <h1>Add a Job</h1>
+
+    <form method="POST" action="{{ url_for('add_job') }}">
+
+        <label for="company_id">Company:</label>
+        <select name="company_id" id="company_id" required>
+            <option value="">Select a company</option>
+            {% for company in companies %}
+                <option value="{{ company.company_id }}">
+                    {{ company.company_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <label for="job_title">Job Title:</label>
+        <input type="text" name="job_title" id="job_title"
+               maxlength="100" required>
+
+        <br><br>
+
+        <label for="job_type">Job Type:</label>
+        <select name="job_type" id="job_type">
+            <option value="">Select a job type</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Contract">Contract</option>
+            <option value="Internship">Internship</option>
+        </select>
+
+        <br><br>
+
+        <label for="salary_min">Minimum Salary:</label>
+        <input type="number" name="salary_min" id="salary_min"
+               min="0" step="1">
+
+        <br><br>
+
+        <label for="salary_max">Maximum Salary:</label>
+        <input type="number" name="salary_max" id="salary_max"
+               min="0" step="1">
+
+        <br><br>
+
+        <label for="posting_url">Job Posting URL:</label>
+        <input type="url" name="posting_url" id="posting_url">
+               maxlength="300">
+
+        <br><br>
+
+        <label for="date_posted">Date Posted:</label>
+        <input type="date" name="date_posted" id="date_posted">
+
+        <br><br>
+
+        <label for="job_description">Job Description:</label>
+        <br>
+        <textarea name="job_description" id="job_description"
+                  rows="5" cols="40"></textarea>
+
+        <br><br>
+
+        <button type="submit">Save Job</button>
+        <a href="{{ url_for('jobs') }}">Cancel</a>
+
+    </form>
+
+</body>
+</html>

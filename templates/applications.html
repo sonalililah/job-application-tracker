@@ -1,0 +1,161 @@
+
+{% extends "base.html" %}
+
+{% block title %}Applications - Job Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Job Applications</h1>
+<p>Track your applications and keep their statuses up to date.</p>
+
+<section>
+    <h2>Add Application</h2>
+
+    {% if jobs %}
+    <form method="POST">
+        <input type="hidden" name="action" value="add">
+
+        <p>
+            <label for="job_id">Job:</label><br>
+            <select name="job_id" id="job_id" required>
+                <option value="">Select a job</option>
+                {% for job in jobs %}
+                    <option value="{{ job.job_id }}">
+                        {{ job.job_title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="application_date">Application Date:</label><br>
+            <input type="date" name="application_date"
+                   id="application_date" required>
+        </p>
+
+        <p>
+            <label for="status">Status:</label><br>
+            <select name="status" id="status">
+                {% for status in ['Applied', 'In Progress', 'Interview', 'Offer', 'Rejected', 'Accepted'] %}
+                    <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="resume_version">Resume Version:</label><br>
+            <input type="text" name="resume_version" id="resume_version">
+        </p>
+
+        <p>
+            <label>
+                <input type="checkbox" name="cover_letter_sent" value="1">
+                Cover letter sent
+            </label>
+        </p>
+
+        <p>
+            <label for="response_date">Response Date:</label><br>
+            <input type="date" name="response_date" id="response_date">
+        </p>
+
+        <p>
+            <label for="interview_date">Interview Date:</label><br>
+            <input type="datetime-local" name="interview_date"
+                   id="interview_date">
+        </p>
+
+        <p>
+            <label for="notes">Notes:</label><br>
+            <textarea name="notes" id="notes" rows="3"></textarea>
+        </p>
+
+        <button type="submit">+ Add Application</button>
+    </form>
+    {% else %}
+        <p>Add a job first before creating an application.</p>
+        <a class="button" href="{{ url_for('jobs') }}">View Jobs</a>
+    {% endif %}
+</section>
+
+<section>
+    <h2>All Applications</h2>
+
+    {% if applications %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Company</th>
+                <th>Job Title</th>
+                <th>Application Date</th>
+                <th>Status</th>
+                <th>Cover Letter</th>
+                <th>Response Date</th>
+                <th>Interview Date</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.application_id }}</td>
+                <td>{{ application.company_name }}</td>
+                <td>{{ application.job_title }}</td>
+                <td>{{ application.application_date }}</td>
+
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="application_id"
+                               value="{{ application.application_id }}">
+
+                        <select name="status">
+                            {% for status in ['Applied', 'In Progress', 'Interview', 'Offer', 'Rejected', 'Accepted'] %}
+                                <option value="{{ status }}"
+                                    {% if application.status == status %}selected{% endif %}>
+                                    {{ status }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                </td>
+
+                <td>{{ 'Yes' if application.cover_letter_sent else 'No' }}</td>
+
+                <td>
+                    <input type="date" name="response_date"
+                           value="{{ application.response_date or '' }}">
+                </td>
+
+                <td>
+                    <input type="datetime-local" name="interview_date"
+                           value="{{ application.interview_date.strftime('%Y-%m-%dT%H:%M') if application.interview_date else '' }}">
+                </td>
+
+                <td>
+                    <textarea name="notes" rows="2">{{ application.notes or '' }}</textarea>
+                </td>
+
+                <td>
+                    <button type="submit">Save</button>
+                    </form>
+
+                    <form method="POST"
+                          onsubmit="return confirm('Delete this application?');">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="application_id"
+                               value="{{ application.application_id }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No applications found yet. Add your first application above.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

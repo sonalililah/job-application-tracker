@@ -1,0 +1,140 @@
+
+{% extends "base.html" %}
+
+{% block title %}Jobs - Job Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Job Listings</h1>
+<p>Manage your saved job opportunities.</p>
+
+{% if edit_job %}
+<section>
+    <h2>Edit Job #{{ edit_job.job_id }}</h2>
+
+    <form method="POST" action="{{ url_for('jobs') }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="job_id" value="{{ edit_job.job_id }}">
+
+        <p>
+            <label for="company_id">Company:</label><br>
+            <select name="company_id" id="company_id" required>
+                {% for company in companies %}
+                    <option value="{{ company.company_id }}"
+                        {% if company.company_id == edit_job.company_id %}selected{% endif %}>
+                        {{ company.company_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="job_title">Job Title:</label><br>
+            <input type="text" name="job_title" id="job_title"
+                   value="{{ edit_job.job_title }}" maxlength="100" required>
+        </p>
+
+        <p>
+            <label for="job_type">Job Type:</label><br>
+            <select name="job_type" id="job_type">
+                <option value="">Select type</option>
+                {% for type in ['Full-time', 'Part-time', 'Contract', 'Internship'] %}
+                    <option value="{{ type }}"
+                        {% if edit_job.job_type == type %}selected{% endif %}>
+                        {{ type }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="salary_min">Minimum Salary:</label><br>
+            <input type="number" step="0.01" min="0" name="salary_min"
+                   id="salary_min"
+                   value="{{ edit_job.salary_min if edit_job.salary_min is not none else '' }}">
+        </p>
+
+        <p>
+            <label for="salary_max">Maximum Salary:</label><br>
+            <input type="number" step="0.01" min="0" name="salary_max"
+                   id="salary_max"
+                   value="{{ edit_job.salary_max if edit_job.salary_max is not none else '' }}">
+        </p>
+
+        <p>
+            <label for="posting_url">Posting URL:</label><br>
+            <input type="url" name="posting_url" id="posting_url"
+                   value="{{ edit_job.posting_url or '' }}">
+        </p>
+
+        <p>
+            <label for="date_posted">Date Posted:</label><br>
+            <input type="date" name="date_posted" id="date_posted"
+                   value="{{ edit_job.date_posted or '' }}">
+        </p>
+
+        <p>
+            <label for="job_description">Description:</label><br>
+            <textarea name="job_description" id="job_description" rows="4">{{ edit_job.job_description or '' }}</textarea>
+        </p>
+
+        <p>
+            <label for="is_active">Active:</label><br>
+            <select name="is_active" id="is_active">
+                <option value="1" {% if edit_job.is_active %}selected{% endif %}>Yes</option>
+                <option value="0" {% if not edit_job.is_active %}selected{% endif %}>No</option>
+            </select>
+        </p>
+
+        <button type="submit">Save Changes</button>
+        <a class="button" href="{{ url_for('jobs') }}">Cancel</a>
+    </form>
+</section>
+{% endif %}
+
+<section>
+    <h2>All Jobs</h2>
+
+    {% if jobs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Company</th>
+                    <th>Job Title</th>
+                    <th>Job Type</th>
+                    <th>Minimum Salary</th>
+                    <th>Maximum Salary</th>
+                    <th>Date Posted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                    <tr>
+                        <td>{{ job.job_id }}</td>
+                        <td>{{ job.company_name }}</td>
+                        <td>{{ job.job_title }}</td>
+                        <td>{{ job.job_type or 'N/A' }}</td>
+                        <td>{{ job.salary_min if job.salary_min is not none else 'N/A' }}</td>
+                        <td>{{ job.salary_max if job.salary_max is not none else 'N/A' }}</td>
+                        <td>{{ job.date_posted or 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('jobs', edit=job.job_id) }}">Edit</a>
+
+                            <form method="POST"
+                                  action="{{ url_for('delete_job', job_id=job.job_id) }}"
+                                  onsubmit="return confirm('Delete this job?');">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No jobs found. Add a job to get started.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

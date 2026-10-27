@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+
+{% block title %}Job Match - Job Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Job Match</h1>
+<p>Compare your skills with the requirements of your saved jobs.</p>
+
+<section>
+    <h2>Enter Your Skills</h2>
+
+    <form method="POST" action="{{ url_for('job_match') }}">
+        <label for="skills">
+            Enter skills separated by commas:
+        </label>
+
+        <p>
+            <input
+                type="text"
+                name="skills"
+                id="skills"
+                size="60"
+                placeholder="Python, SQL, Flask, MySQL"
+                value="{{ user_skills | join(', ') }}"
+                required
+            >
+        </p>
+
+        <button type="submit">Find Matching Jobs</button>
+    </form>
+</section>
+
+{% if request.method == 'POST' %}
+    <section>
+        <h2>Matching Results</h2>
+
+        {% if matched_jobs %}
+            {% for job in matched_jobs %}
+                <div class="card">
+                    <h3>{{ job.job_title }}</h3>
+
+                    <p>
+                        <strong>Company:</strong>
+                        {{ job.company_name }}
+                    </p>
+
+                    <p>
+                        <strong>Job Type:</strong>
+                        {{ job.job_type or 'N/A' }}
+                    </p>
+
+                    <p>
+                        <strong>Skills Match:</strong>
+                        {{ job.match_percentage }}%
+                    </p>
+
+                    <progress
+                        value="{{ job.match_percentage }}"
+                        max="100">
+                    </progress>
+
+                    <p>
+                        <strong>Required Skills:</strong>
+                        {{ job.required_skills | join(', ') if job.required_skills else 'No requirements listed' }}
+                    </p>
+
+                    <p>
+                        <strong>Skills You Match:</strong>
+                        {{ job.matching_skills | join(', ') if job.matching_skills else 'None yet' }}
+                    </p>
+
+                    <a class="button" href="{{ url_for('jobs') }}">
+                        View Job Listings
+                    </a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No active jobs found to compare.</p>
+        {% endif %}
+    </section>
+{% endif %}
+
+{% endblock %}
