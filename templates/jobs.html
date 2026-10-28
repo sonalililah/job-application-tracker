@@ -8,6 +8,12 @@
 <h1>Job Listings</h1>
 <p>Manage your saved job opportunities.</p>
 
+<p>
+    <a href="{{ url_for('add_job') }}" class="button">
+        + Add Job
+    </a>
+</p>
+
 {% if edit_job %}
 <section>
     <h2>Edit Job #{{ edit_job.job_id }}</h2>
